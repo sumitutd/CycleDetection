@@ -1,0 +1,97 @@
+{
+  "$schema-template": "4.0.0",
+  "modulesContent": {
+    "$edgeAgent": {
+      "properties.desired": {
+        "schemaVersion": "1.1",
+        "runtime": {
+          "type": "docker",
+          "settings": {
+            "minDockerVersion": "v1.25",
+            "loggingOptions": "",
+            "registryCredentials": {
+              "planttelematicscontainerregistrydev": {
+                "username": "PlantTelematicsContainerRegistryDev",
+                "password": "=ACFWXgKQLUuURSSEbjMcDpMt4GwUB98",
+                "address": "planttelematicscontainerregistrydev.azurecr.io"
+              }
+            }
+          }
+        },
+        "systemModules": {
+          "edgeAgent": {
+            "type": "docker",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.4",
+              "createOptions": {}
+            }
+          },
+          "edgeHub": {
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.4",
+              "createOptions": {
+                "HostConfig": {
+                  "PortBindings": {
+                    "5671/tcp": [
+                      {
+                        "HostPort": "5671"
+                      }
+                    ],
+                    "8883/tcp": [
+                      {
+                        "HostPort": "8883"
+                      }
+                    ],
+                    "443/tcp": [
+                      {
+                        "HostPort": "443"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "modules": {
+          "SensorBridge": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "planttelematicscontainerregistrydev.azurecr.io/sensorbridge:0.0.23-arm32v7",
+              "createOptions": {}
+            }
+          },
+          "CycleDetection": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "planttelematicscontainerregistrydev.azurecr.io/cycledetection:0.0.13-arm32v7.debug",
+              "createOptions": {}
+            }
+          }
+        }
+      }
+    },
+    "$edgeHub": {
+      "properties.desired": {
+        "schemaVersion": "1.2",
+        "routes": {
+          "SensorBridgeToIoTHub": "FROM /messages/modules/SensorBridge/outputs/edgeMessageOuput INTO BrokeredEndpoint('/modules/CycleDetection/inputs/tags')",
+          "cycleDetectionToIotHub" : "FROM /messages/modules/CycleDetection/outputs/edgeMessageOuput INTO $upstream",
+          "toHub" :"FROM /messages/modules/SensorBridge/outputs/output1 INTO $upstream"
+        },
+        "storeAndForwardConfiguration": {
+          "timeToLiveSecs": 7200
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+FROM arm32v7/node:18-buster
+
+WORKDIR /app/
+
+COPY package*.json ./
+
+COPY . .
+
+RUN npm install
+
+RUN npm run build
+
+CMD ["node","./build/iot.js"]

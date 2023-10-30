@@ -1,0 +1,15 @@
+{
+    "$schema-version": "0.0.1",
+    "description": "",
+    "image": {
+        "repository": "planttelematicscontainerregistrydev.azurecr.io/cycledetection",
+        "tag": {
+            "version": "0.0.13",
+            "platforms": {
+                "arm32v7.debug": "./Dockerfile.arm32v7.debug"
+            }
+        },
+        "buildOptions": []
+    },
+    "language": "javascript"
+}
